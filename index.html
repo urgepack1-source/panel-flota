@@ -68,7 +68,7 @@
 </head>
 <body>
 
-    <!-- LOGIN - SIEMPRE VISIBLE hasta que Firebase confirme login -->
+    <!-- LOGIN -->
     <div id="login-screen" class="login-container">
         <h2>🚐 Panel Flota UrgePack</h2>
         <div id="error-box" class="error-box"></div>
@@ -138,23 +138,27 @@
 
     <script>
         // =====================================================
-        // 🔥 PEGA AQUÍ TU firebaseConfig COMPLETO (con databaseURL)
+        // 🔥 IMPORTANTE: PEGA AQUÍ TU firebaseConfig COMPLETO
+        // Copia TODO el bloque desde Firebase Console y pégalo aquí
+        // Asegúrate de incluir la línea databaseURL
         // =====================================================
+        
         const firebaseConfig = {
-  apiKey: "AIzaSy...(algo largo)...",
-  authDomain: "urgepack-flota.firebaseapp.com",
-  projectId: "urgepack-flota",
-  storageBucket: "urgepack-flota.firebasestorage.app",
-  messagingSenderId: "123456789012",
-  appId: "1:123456789012:web:abcdef123456"
-};
+         apiKey: "AIzaSyCWTIIrqjKniH_uEGiy2alCE4xlVSNxNRY",
+         authDomain: "urgepack-flota.firebaseapp.com",
+         databaseURL: "https://urgepack-flota-default-rtdb.europe-west1.firebasedatabase.app",
+         projectId: "urgepack-flota",
+         storageBucket: "urgepack-flota.firebasestorage.app",
+         messagingSenderId: "594407555675",
+         appId: "1:594407555675:web:5799154aa155f7de8f757e"
+        };
+        
         // =====================================================
 
         let modoLogin = null;
         let modoActual = null;
         let auth, db;
 
-        // ===== INICIALIZAR FIREBASE CON MANEJO DE ERRORES =====
         try {
             firebase.initializeApp(firebaseConfig);
             auth = firebase.auth();
@@ -172,7 +176,6 @@
             box.style.display = 'block';
         }
 
-        // ===== LOGIN =====
         function setModo(m) {
             modoLogin = m;
             document.getElementById('btn-jefe').className = (m === 'jefe') ? 'sel-jefe' : '';
@@ -200,7 +203,6 @@
 
         function logout() { auth.signOut(); }
 
-        // ===== SESIÓN =====
         if (auth) {
             auth.onAuthStateChanged(user => {
                 if (user) {
@@ -273,7 +275,7 @@
                 snap.forEach(child => pedidos.push(Object.assign({ id: child.key }, child.val())));
                 pedidos.sort((a, b) => (b.fechaCreacion || '').localeCompare(a.fechaCreacion || ''));
                 renderPedidos(pedidos);
-            }, err => mostrarError('Error al escuchar pedidos: ' + err.message + '. Revisa las reglas de Realtime Database.'));
+            }, err => mostrarError('Error al escuchar pedidos: ' + err.message));
         }
 
         function renderPedidos(pedidos) {
