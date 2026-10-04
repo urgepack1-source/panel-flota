@@ -10,9 +10,8 @@
         .container { max-width: 1200px; margin: 0 auto; padding: 20px; }
         .header { background: linear-gradient(135deg, #1a2332 0%, #243044 100%); color: white; padding: 20px; border-radius: 12px; margin-bottom: 30px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; }
         .header h1 { font-size: 22px; }
-        .header .user-info { display: flex; align-items: center; gap: 15px; }
         .header button { background: #ff6b1a; color: white; border: none; padding: 10px 20px; border-radius: 8px; cursor: pointer; font-weight: 600; }
-        .rol-badge { padding: 5px 14px; border-radius: 50px; font-size: 12px; font-weight: 800; }
+        .rol-badge { padding: 5px 14px; border-radius: 50px; font-size: 12px; font-weight: 800; margin-left: 10px; }
         .rol-jefe { background: #ff6b1a; color: #fff; }
         .rol-socio { background: #3b82f6; color: #fff; }
         .live-dot { display: inline-block; width: 10px; height: 10px; background: #22c55e; border-radius: 50%; margin-right: 6px; animation: blink 1.4s infinite; }
@@ -26,6 +25,7 @@
         .login-container input { width: 100%; padding: 12px; margin-bottom: 15px; border: 2px solid #e2e8f0; border-radius: 8px; font-size: 16px; }
         .login-container .enter { width: 100%; padding: 14px; background: #ff6b1a; color: white; border: none; border-radius: 8px; font-size: 16px; font-weight: 600; cursor: pointer; }
         .login-hint { text-align: center; margin-top: 18px; color: #6b7a8f; font-size: 13px; }
+        .error-box { background: #fee2e2; border: 2px solid #ef4444; color: #991b1b; padding: 15px; border-radius: 8px; margin-bottom: 15px; font-size: 14px; display: none; }
         .tabs { display: flex; gap: 10px; margin-bottom: 20px; flex-wrap: wrap; }
         .tab { padding: 12px 24px; background: white; border: 2px solid #e2e8f0; border-radius: 8px; cursor: pointer; font-weight: 600; }
         .tab.active { background: #ff6b1a; color: white; border-color: #ff6b1a; }
@@ -68,9 +68,10 @@
 </head>
 <body>
 
-    <!-- LOGIN -->
-    <div id="login-screen" class="login-container" style="display:none;">
+    <!-- LOGIN - SIEMPRE VISIBLE hasta que Firebase confirme login -->
+    <div id="login-screen" class="login-container">
         <h2>🚐 Panel Flota UrgePack</h2>
+        <div id="error-box" class="error-box"></div>
         <div class="role-btns">
             <button id="btn-jefe" onclick="setModo('jefe')">👑 Soy JEFE</button>
             <button id="btn-socio" onclick="setModo('socio')">👷 Soy SOCIO</button>
@@ -78,6 +79,7 @@
         <input type="password" id="password" placeholder="Contraseña del equipo" onkeypress="if(event.key==='Enter') login()">
         <button class="enter" onclick="login()">Entrar</button>
         <p class="login-hint">Contraseña del equipo: <strong>urgepack2026</strong></p>
+        <p class="login-hint" id="status-firebase">⏳ Cargando Firebase...</p>
     </div>
 
     <!-- PANEL -->
@@ -85,7 +87,7 @@
         <div class="container">
             <div class="header">
                 <h1>🚐 Panel Flota <span class="live-dot"></span><small>EN VIVO</small> <span id="rol-badge" class="rol-badge"></span></h1>
-                <div class="user-info">
+                <div>
                     <button onclick="logout()">Salir</button>
                 </div>
             </div>
@@ -149,12 +151,27 @@
         };
         // =====================================================
 
-        firebase.initializeApp(firebaseConfig);
-        const auth = firebase.auth();
-        const db = firebase.database();
+        let modoLogin = null;
+        let modoActual = null;
+        let auth, db;
 
-        let modoLogin = null;      // qué botón pulsó en el login
-        let modoActual = null;     // 'jefe' o 'socio' (según el usuario conectado)
+        // ===== INICIALIZAR FIREBASE CON MANEJO DE ERRORES =====
+        try {
+            firebase.initializeApp(firebaseConfig);
+            auth = firebase.auth();
+            db = firebase.database();
+            document.getElementById('status-firebase').textContent = '✅ Firebase cargado. Elige tu rol y entra.';
+            console.log('✅ Firebase inicializado correctamente');
+        } catch (error) {
+            mostrarError('Error inicializando Firebase: ' + error.message + '. Revisa que hayas pegado tu firebaseConfig completo (con databaseURL).');
+            console.error('❌ Error Firebase:', error);
+        }
+
+        function mostrarError(msg) {
+            const box = document.getElementById('error-box');
+            box.textContent = '❌ ' + msg;
+            box.style.display = 'block';
+        }
 
         // ===== LOGIN =====
         function setModo(m) {
@@ -164,29 +181,42 @@
         }
 
         function login() {
+            if (!auth) { mostrarError('Firebase no está cargado. Revisa la consola (F12).'); return; }
             if (!modoLogin) { alert('Pulsa primero si eres JEFE o SOCIO'); return; }
             const pass = document.getElementById('password').value;
             const email = (modoLogin === 'jefe') ? 'jefe@urgepack.es' : 'socio@urgepack.es';
             auth.signInWithEmailAndPassword(email, pass)
-                .catch(err => alert('Contraseña incorrecta. Usa: urgepack2026'));
+                .catch(err => {
+                    let msg = 'Error al entrar';
+                    if (err.code === 'auth/user-not-found' || err.code === 'auth/invalid-email') {
+                        msg = 'El usuario no existe. Revisa que hayas creado ' + email + ' en Firebase Authentication.';
+                    } else if (err.code === 'auth/wrong-password') {
+                        msg = 'Contraseña incorrecta. Usa: urgepack2026';
+                    } else if (err.code === 'auth/invalid-credential') {
+                        msg = 'Credenciales incorrectas. Revisa email y contraseña.';
+                    }
+                    mostrarError(msg);
+                });
         }
 
         function logout() { auth.signOut(); }
 
         // ===== SESIÓN =====
-        auth.onAuthStateChanged(user => {
-            if (user) {
-                modoActual = (user.email === 'jefe@urgepack.es') ? 'jefe' : 'socio';
-                document.getElementById('login-screen').style.display = 'none';
-                document.getElementById('panel-screen').style.display = 'block';
-                configurarInterfaz();
-                escucharPedidos();
-            } else {
-                modoActual = null;
-                document.getElementById('login-screen').style.display = 'block';
-                document.getElementById('panel-screen').style.display = 'none';
-            }
-        });
+        if (auth) {
+            auth.onAuthStateChanged(user => {
+                if (user) {
+                    modoActual = (user.email === 'jefe@urgepack.es') ? 'jefe' : 'socio';
+                    document.getElementById('login-screen').style.display = 'none';
+                    document.getElementById('panel-screen').style.display = 'block';
+                    configurarInterfaz();
+                    escucharPedidos();
+                } else {
+                    modoActual = null;
+                    document.getElementById('login-screen').style.display = 'block';
+                    document.getElementById('panel-screen').style.display = 'none';
+                }
+            });
+        }
 
         function configurarInterfaz() {
             const badge = document.getElementById('rol-badge');
@@ -198,21 +228,19 @@
             } else {
                 badge.textContent = '👷 SOCIO';
                 badge.className = 'rol-badge rol-socio';
-                tabCrear.style.display = 'none';   // el socio NO crea pedidos
-                showTab('pedidos');                  // entra directo a la lista
+                tabCrear.style.display = 'none';
+                showTab('pedidos');
             }
         }
 
-        // ===== TABS =====
         function showTab(tab) {
-            if (modoActual === 'socio') tab = 'pedidos'; // el socio solo tiene esta
+            if (modoActual === 'socio') tab = 'pedidos';
             document.getElementById('tab-crear').style.display = tab === 'crear' ? 'block' : 'none';
             document.getElementById('tab-pedidos').style.display = tab === 'pedidos' ? 'block' : 'none';
             document.getElementById('tab-btn-crear').classList.toggle('active', tab === 'crear');
             document.getElementById('tab-btn-pedidos').classList.toggle('active', tab === 'pedidos');
         }
 
-        // ===== CREAR PEDIDO (solo jefe) =====
         function crearPedido() {
             const cliente = document.getElementById('cliente').value.trim();
             const origen = document.getElementById('origen').value.trim();
@@ -234,24 +262,22 @@
                 fechaCreacion: new Date().toISOString()
             };
             db.ref('pedidos').push(pedido).then(() => {
-                alert('✅ Pedido publicado. Tus socios ya lo están viendo.');
+                alert('✅ Pedido publicado.');
                 ['cliente','telefono','origen','destino','precio','notas'].forEach(id => document.getElementById(id).value = '');
                 showTab('pedidos');
-            });
+            }).catch(err => mostrarError('Error al crear: ' + err.message));
         }
 
-        // ===== ESCUCHAR EN TIEMPO REAL =====
         function escucharPedidos() {
             db.ref('pedidos').on('value', snap => {
                 const pedidos = [];
                 snap.forEach(child => pedidos.push(Object.assign({ id: child.key }, child.val())));
                 pedidos.sort((a, b) => (b.fechaCreacion || '').localeCompare(a.fechaCreacion || ''));
                 renderPedidos(pedidos);
-            });
+            }, err => mostrarError('Error al escuchar pedidos: ' + err.message + '. Revisa las reglas de Realtime Database.'));
         }
 
         function renderPedidos(pedidos) {
-            // 🔒 AQUÍ ESTÁ LA MAGIA: el socio SOLO ve los pendientes
             let lista = pedidos;
             if (modoActual === 'socio') {
                 lista = pedidos.filter(p => p.estado === 'pendiente');
@@ -264,7 +290,7 @@
 
             if (!lista.length) {
                 container.innerHTML = titulo + '<div class="empty-state"><h3>📭 Nada por aquí</h3><p>' +
-                    (modoActual === 'socio' ? 'No hay trabajos disponibles ahora mismo. Te avisamos cuando entre algo.' : 'Crea el primero en la pestaña "Crear Pedido"') +
+                    (modoActual === 'socio' ? 'No hay trabajos disponibles ahora mismo.' : 'Crea el primero en "Crear Pedido"') +
                     '</p></div>';
                 return;
             }
@@ -279,7 +305,7 @@
                         <div class="pedido-detail"><label>📞 Teléfono</label><span>${p.telefono || '-'}</span></div>
                         <div class="pedido-detail"><label>📍 Origen</label><span>${p.origen}</span></div>
                         <div class="pedido-detail"><label>🎯 Destino</label><span>${p.destino}</span></div>
-                        <div class="pedido-detail"><label>📦 Tipo</label><span>${p.tipo === 'envio' ? 'Envío urgente' : p.tipo === 'mueble' ? 'Mueble' : 'Mudanza'}</span></div>
+                        <div class="pedido-detail"><label>📦 Tipo</label><span>${p.tipo === 'envio' ? 'Envío' : p.tipo === 'mueble' ? 'Mueble' : 'Mudanza'}</span></div>
                         <div class="pedido-detail"><label>💰 Precio</label><span>${Number(p.precio).toFixed(2)}€</span></div>
                         <div class="pedido-detail"><label>📅 Fecha/Hora</label><span>${p.fecha || '-'} ${p.hora || ''}</span></div>
                         ${p.socioAsignado ? `<div class="pedido-detail"><label>👤 Socio</label><span>${p.socioAsignado}</span></div>` : ''}
@@ -301,9 +327,8 @@
             `).join('');
         }
 
-        // ===== ACCIONES =====
         function aceptarPedido(id) {
-            const socio = prompt('Escribe tu nombre para asignarte el pedido:');
+            const socio = prompt('Escribe tu nombre:');
             if (!socio) return;
             db.ref('pedidos/' + id).update({ estado: 'aceptado', socioAsignado: socio });
         }
@@ -314,12 +339,12 @@
         }
 
         function completarPedido(id) {
-            if (!confirm('¿Marcar como completado y cobrado?')) return;
+            if (!confirm('¿Marcar como completado?')) return;
             db.ref('pedidos/' + id).update({ estado: 'completado', fechaCompletado: new Date().toISOString() });
         }
 
         function eliminarPedido(id) {
-            if (!confirm('¿Eliminar este pedido para siempre?')) return;
+            if (!confirm('¿Eliminar este pedido?')) return;
             db.ref('pedidos/' + id).remove();
         }
 
