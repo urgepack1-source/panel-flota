@@ -12,13 +12,20 @@
         .header h1 { font-size: 22px; }
         .header .user-info { display: flex; align-items: center; gap: 15px; }
         .header button { background: #ff6b1a; color: white; border: none; padding: 10px 20px; border-radius: 8px; cursor: pointer; font-weight: 600; }
+        .rol-badge { padding: 5px 14px; border-radius: 50px; font-size: 12px; font-weight: 800; }
+        .rol-jefe { background: #ff6b1a; color: #fff; }
+        .rol-socio { background: #3b82f6; color: #fff; }
         .live-dot { display: inline-block; width: 10px; height: 10px; background: #22c55e; border-radius: 50%; margin-right: 6px; animation: blink 1.4s infinite; }
         @keyframes blink { 0%,100%{opacity:1;} 50%{opacity:.25;} }
-        .login-container { max-width: 400px; margin: 100px auto; background: white; padding: 40px; border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); }
-        .login-container h2 { text-align: center; margin-bottom: 30px; color: #ff6b1a; }
+        .login-container { max-width: 400px; margin: 80px auto; background: white; padding: 40px; border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); }
+        .login-container h2 { text-align: center; margin-bottom: 24px; color: #ff6b1a; }
+        .role-btns { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 18px; }
+        .role-btns button { padding: 14px 8px; border: 2px solid #e2e8f0; background: #f9fafb; border-radius: 10px; font-size: 15px; font-weight: 700; cursor: pointer; }
+        .role-btns button.sel-jefe { border-color: #ff6b1a; background: #fff5ee; color: #e55a0a; }
+        .role-btns button.sel-socio { border-color: #3b82f6; background: #eff6ff; color: #1d4ed8; }
         .login-container input { width: 100%; padding: 12px; margin-bottom: 15px; border: 2px solid #e2e8f0; border-radius: 8px; font-size: 16px; }
-        .login-container button { width: 100%; padding: 14px; background: #ff6b1a; color: white; border: none; border-radius: 8px; font-size: 16px; font-weight: 600; cursor: pointer; }
-        .login-hint { text-align: center; margin-top: 20px; color: #6b7a8f; font-size: 13px; }
+        .login-container .enter { width: 100%; padding: 14px; background: #ff6b1a; color: white; border: none; border-radius: 8px; font-size: 16px; font-weight: 600; cursor: pointer; }
+        .login-hint { text-align: center; margin-top: 18px; color: #6b7a8f; font-size: 13px; }
         .tabs { display: flex; gap: 10px; margin-bottom: 20px; flex-wrap: wrap; }
         .tab { padding: 12px 24px; background: white; border: 2px solid #e2e8f0; border-radius: 8px; cursor: pointer; font-weight: 600; }
         .tab.active { background: #ff6b1a; color: white; border-color: #ff6b1a; }
@@ -26,20 +33,23 @@
         .pedido-card.pendiente { border-left-color: #f59e0b; }
         .pedido-card.aceptado { border-left-color: #3b82f6; }
         .pedido-card.completado { border-left-color: #22c55e; }
+        .pedido-card.rechazado { border-left-color: #94a3b8; opacity: .75; }
         .pedido-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; flex-wrap: wrap; gap: 8px; }
         .pedido-header h3 { font-size: 18px; color: #1a2332; }
         .pedido-status { padding: 6px 12px; border-radius: 50px; font-size: 12px; font-weight: 700; text-transform: uppercase; }
         .pedido-status.pendiente { background: #fef3c7; color: #92400e; }
         .pedido-status.aceptado { background: #dbeafe; color: #1e40af; }
         .pedido-status.completado { background: #d1fae5; color: #065f46; }
+        .pedido-status.rechazado { background: #e2e8f0; color: #475569; }
         .pedido-details { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-bottom: 15px; }
         .pedido-detail label { display: block; font-size: 12px; color: #6b7a8f; font-weight: 600; margin-bottom: 4px; }
         .pedido-detail span { font-size: 15px; font-weight: 600; color: #1a2332; }
         .pedido-actions { display: flex; gap: 10px; flex-wrap: wrap; }
         .pedido-actions button { padding: 10px 20px; border: none; border-radius: 8px; font-weight: 600; cursor: pointer; font-size: 14px; }
         .btn-aceptar { background: #22c55e; color: white; }
+        .btn-rechazar { background: #ef4444; color: white; }
         .btn-completar { background: #3b82f6; color: white; }
-        .btn-eliminar { background: #ef4444; color: white; }
+        .btn-eliminar { background: #94a3b8; color: white; }
         .form-pedido { background: white; border-radius: 12px; padding: 30px; margin-bottom: 30px; box-shadow: 0 4px 12px rgba(0,0,0,0.08); }
         .form-pedido h2 { margin-bottom: 20px; color: #ff6b1a; }
         .form-group { margin-bottom: 15px; }
@@ -61,8 +71,12 @@
     <!-- LOGIN -->
     <div id="login-screen" class="login-container" style="display:none;">
         <h2>🚐 Panel Flota UrgePack</h2>
+        <div class="role-btns">
+            <button id="btn-jefe" onclick="setModo('jefe')">👑 Soy JEFE</button>
+            <button id="btn-socio" onclick="setModo('socio')">👷 Soy SOCIO</button>
+        </div>
         <input type="password" id="password" placeholder="Contraseña del equipo" onkeypress="if(event.key==='Enter') login()">
-        <button onclick="login()">Entrar</button>
+        <button class="enter" onclick="login()">Entrar</button>
         <p class="login-hint">Contraseña del equipo: <strong>urgepack2026</strong></p>
     </div>
 
@@ -70,16 +84,15 @@
     <div id="panel-screen" style="display:none;">
         <div class="container">
             <div class="header">
-                <h1>🚐 Panel Flota UrgePack <span class="live-dot"></span><small>EN VIVO</small></h1>
+                <h1>🚐 Panel Flota <span class="live-dot"></span><small>EN VIVO</small> <span id="rol-badge" class="rol-badge"></span></h1>
                 <div class="user-info">
-                    <span id="user-name">Equipo</span>
                     <button onclick="logout()">Salir</button>
                 </div>
             </div>
 
             <div class="tabs">
                 <div class="tab active" id="tab-btn-crear" onclick="showTab('crear')">➕ Crear Pedido</div>
-                <div class="tab" id="tab-btn-pedidos" onclick="showTab('pedidos')">📋 Ver Pedidos</div>
+                <div class="tab" id="tab-btn-pedidos" onclick="showTab('pedidos')">📋 Pedidos</div>
             </div>
 
             <div id="tab-crear" class="form-pedido">
@@ -117,7 +130,6 @@
         </div>
     </div>
 
-    <!-- SDK de Firebase -->
     <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-database-compat.js"></script>
@@ -141,98 +153,123 @@
         const auth = firebase.auth();
         const db = firebase.database();
 
-        const EMAIL_EQUIPO = 'flota@urgepack.es';
+        let modoLogin = null;      // qué botón pulsó en el login
+        let modoActual = null;     // 'jefe' o 'socio' (según el usuario conectado)
+
+        // ===== LOGIN =====
+        function setModo(m) {
+            modoLogin = m;
+            document.getElementById('btn-jefe').className = (m === 'jefe') ? 'sel-jefe' : '';
+            document.getElementById('btn-socio').className = (m === 'socio') ? 'sel-socio' : '';
+        }
+
+        function login() {
+            if (!modoLogin) { alert('Pulsa primero si eres JEFE o SOCIO'); return; }
+            const pass = document.getElementById('password').value;
+            const email = (modoLogin === 'jefe') ? 'jefe@urgepack.es' : 'socio@urgepack.es';
+            auth.signInWithEmailAndPassword(email, pass)
+                .catch(err => alert('Contraseña incorrecta. Usa: urgepack2026'));
+        }
+
+        function logout() { auth.signOut(); }
 
         // ===== SESIÓN =====
         auth.onAuthStateChanged(user => {
             if (user) {
+                modoActual = (user.email === 'jefe@urgepack.es') ? 'jefe' : 'socio';
                 document.getElementById('login-screen').style.display = 'none';
                 document.getElementById('panel-screen').style.display = 'block';
+                configurarInterfaz();
                 escucharPedidos();
             } else {
+                modoActual = null;
                 document.getElementById('login-screen').style.display = 'block';
                 document.getElementById('panel-screen').style.display = 'none';
             }
         });
 
-        function login() {
-            const pass = document.getElementById('password').value;
-            auth.signInWithEmailAndPassword(EMAIL_EQUIPO, pass)
-                .catch(err => alert('Contraseña incorrecta. Usa: urgepack2026'));
-        }
-
-        function logout() {
-            auth.signOut();
+        function configurarInterfaz() {
+            const badge = document.getElementById('rol-badge');
+            const tabCrear = document.getElementById('tab-btn-crear');
+            if (modoActual === 'jefe') {
+                badge.textContent = '👑 JEFE';
+                badge.className = 'rol-badge rol-jefe';
+                tabCrear.style.display = 'block';
+            } else {
+                badge.textContent = '👷 SOCIO';
+                badge.className = 'rol-badge rol-socio';
+                tabCrear.style.display = 'none';   // el socio NO crea pedidos
+                showTab('pedidos');                  // entra directo a la lista
+            }
         }
 
         // ===== TABS =====
         function showTab(tab) {
+            if (modoActual === 'socio') tab = 'pedidos'; // el socio solo tiene esta
             document.getElementById('tab-crear').style.display = tab === 'crear' ? 'block' : 'none';
             document.getElementById('tab-pedidos').style.display = tab === 'pedidos' ? 'block' : 'none';
             document.getElementById('tab-btn-crear').classList.toggle('active', tab === 'crear');
             document.getElementById('tab-btn-pedidos').classList.toggle('active', tab === 'pedidos');
         }
 
-        // ===== CREAR PEDIDO =====
+        // ===== CREAR PEDIDO (solo jefe) =====
         function crearPedido() {
             const cliente = document.getElementById('cliente').value.trim();
             const origen = document.getElementById('origen').value.trim();
             const destino = document.getElementById('destino').value.trim();
             const precio = document.getElementById('precio').value;
-
             if (!cliente || !origen || !destino || !precio) {
-                alert('Completa los campos obligatorios: Cliente, Origen, Destino y Precio');
+                alert('Completa: Cliente, Origen, Destino y Precio');
                 return;
             }
-
             const pedido = {
-                cliente: cliente,
-                telefono: document.getElementById('telefono').value.trim(),
-                origen: origen,
-                destino: destino,
+                cliente, telefono: document.getElementById('telefono').value.trim(),
+                origen, destino,
                 tipo: document.getElementById('tipo').value,
                 precio: parseFloat(precio),
                 fecha: document.getElementById('fecha').value,
                 hora: document.getElementById('hora').value,
                 notas: document.getElementById('notas').value.trim(),
-                estado: 'pendiente',
-                socioAsignado: null,
+                estado: 'pendiente', socioAsignado: null,
                 fechaCreacion: new Date().toISOString()
             };
-
-            db.ref('pedidos').push(pedido)
-                .then(() => {
-                    alert('✅ Pedido creado. Ya lo están viendo todos tus socios en vivo.');
-                    document.getElementById('cliente').value = '';
-                    document.getElementById('telefono').value = '';
-                    document.getElementById('origen').value = '';
-                    document.getElementById('destino').value = '';
-                    document.getElementById('precio').value = '';
-                    document.getElementById('notas').value = '';
-                    showTab('pedidos');
-                })
-                .catch(err => alert('Error al crear: ' + err.message));
+            db.ref('pedidos').push(pedido).then(() => {
+                alert('✅ Pedido publicado. Tus socios ya lo están viendo.');
+                ['cliente','telefono','origen','destino','precio','notas'].forEach(id => document.getElementById(id).value = '');
+                showTab('pedidos');
+            });
         }
 
-        // ===== ESCUCHAR PEDIDOS EN TIEMPO REAL =====
+        // ===== ESCUCHAR EN TIEMPO REAL =====
         function escucharPedidos() {
             db.ref('pedidos').on('value', snap => {
                 const pedidos = [];
-                snap.forEach(child => {
-                    pedidos.push(Object.assign({ id: child.key }, child.val()));
-                });
+                snap.forEach(child => pedidos.push(Object.assign({ id: child.key }, child.val())));
                 pedidos.sort((a, b) => (b.fechaCreacion || '').localeCompare(a.fechaCreacion || ''));
                 renderPedidos(pedidos);
             });
         }
 
         function renderPedidos(pedidos) {
+            // 🔒 AQUÍ ESTÁ LA MAGIA: el socio SOLO ve los pendientes
+            let lista = pedidos;
+            if (modoActual === 'socio') {
+                lista = pedidos.filter(p => p.estado === 'pendiente');
+            }
+
             const container = document.getElementById('lista-pedidos');
-            if (!pedidos.length) {
-                container.innerHTML = '<div class="empty-state"><h3>📭 No hay pedidos todavía</h3><p>Crea el primero en la pestaña "Crear Pedido"</p></div>';
+            const titulo = (modoActual === 'socio')
+                ? '<h2 style="margin-bottom:15px;">📥 Trabajos disponibles para ti</h2>'
+                : '';
+
+            if (!lista.length) {
+                container.innerHTML = titulo + '<div class="empty-state"><h3>📭 Nada por aquí</h3><p>' +
+                    (modoActual === 'socio' ? 'No hay trabajos disponibles ahora mismo. Te avisamos cuando entre algo.' : 'Crea el primero en la pestaña "Crear Pedido"') +
+                    '</p></div>';
                 return;
             }
-            container.innerHTML = pedidos.map(p => `
+
+            container.innerHTML = titulo + lista.map(p => `
                 <div class="pedido-card ${p.estado}">
                     <div class="pedido-header">
                         <h3>${p.cliente}</h3>
@@ -249,9 +286,16 @@
                         ${p.notas ? `<div class="pedido-detail"><label>📝 Notas</label><span>${p.notas}</span></div>` : ''}
                     </div>
                     <div class="pedido-actions">
-                        ${p.estado === 'pendiente' ? `<button class="btn-aceptar" onclick="aceptarPedido('${p.id}')">✅ Aceptar</button>` : ''}
-                        ${p.estado === 'aceptado' ? `<button class="btn-completar" onclick="completarPedido('${p.id}')">✓ Completar</button>` : ''}
-                        <button class="btn-eliminar" onclick="eliminarPedido('${p.id}')">🗑️</button>
+                        ${p.estado === 'pendiente' ? `
+                            <button class="btn-aceptar" onclick="aceptarPedido('${p.id}')">✅ Aceptar</button>
+                            <button class="btn-rechazar" onclick="rechazarPedido('${p.id}')">❌ Rechazar</button>
+                        ` : ''}
+                        ${p.estado === 'aceptado' && modoActual === 'jefe' ? `
+                            <button class="btn-completar" onclick="completarPedido('${p.id}')">✓ Completar</button>
+                        ` : ''}
+                        ${modoActual === 'jefe' ? `
+                            <button class="btn-eliminar" onclick="eliminarPedido('${p.id}')">🗑️</button>
+                        ` : ''}
                     </div>
                 </div>
             `).join('');
@@ -259,22 +303,26 @@
 
         // ===== ACCIONES =====
         function aceptarPedido(id) {
-            const socio = prompt('¿Qué socio acepta este pedido?\nEscribe tu nombre:');
+            const socio = prompt('Escribe tu nombre para asignarte el pedido:');
             if (!socio) return;
             db.ref('pedidos/' + id).update({ estado: 'aceptado', socioAsignado: socio });
         }
 
+        function rechazarPedido(id) {
+            const motivo = prompt('¿Por qué lo rechazas? (opcional)');
+            db.ref('pedidos/' + id).update({ estado: 'rechazado', motivoRechazo: motivo || 'Sin motivo' });
+        }
+
         function completarPedido(id) {
-            if (!confirm('¿Marcar como completado?')) return;
+            if (!confirm('¿Marcar como completado y cobrado?')) return;
             db.ref('pedidos/' + id).update({ estado: 'completado', fechaCompletado: new Date().toISOString() });
         }
 
         function eliminarPedido(id) {
-            if (!confirm('¿Eliminar este pedido?')) return;
+            if (!confirm('¿Eliminar este pedido para siempre?')) return;
             db.ref('pedidos/' + id).remove();
         }
 
-        // Fecha/hora por defecto
         document.getElementById('fecha').valueAsDate = new Date();
         document.getElementById('hora').value = new Date().toTimeString().slice(0, 5);
     </script>
