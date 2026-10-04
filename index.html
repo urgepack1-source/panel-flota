@@ -3,146 +3,163 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Panel Flota UrgePack</title>
+    <title>Pedir Presupuesto con Foto - UrgePack Madrid</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #f5f7fa; color: #1a2332; }
-        .container { max-width: 1200px; margin: 0 auto; padding: 20px; }
-        .header { background: linear-gradient(135deg, #1a2332 0%, #243044 100%); color: white; padding: 20px; border-radius: 12px; margin-bottom: 30px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; }
-        .header h1 { font-size: 22px; }
-        .header button { background: #ff6b1a; color: white; border: none; padding: 10px 20px; border-radius: 8px; cursor: pointer; font-weight: 600; }
-        .rol-badge { padding: 5px 14px; border-radius: 50px; font-size: 12px; font-weight: 800; margin-left: 10px; }
-        .rol-jefe { background: #ff6b1a; color: #fff; }
-        .rol-socio { background: #3b82f6; color: #fff; }
-        .live-dot { display: inline-block; width: 10px; height: 10px; background: #22c55e; border-radius: 50%; margin-right: 6px; animation: blink 1.4s infinite; }
-        @keyframes blink { 0%,100%{opacity:1;} 50%{opacity:.25;} }
-        .login-container { max-width: 400px; margin: 80px auto; background: white; padding: 40px; border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); }
-        .login-container h2 { text-align: center; margin-bottom: 24px; color: #ff6b1a; }
-        .role-btns { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 18px; }
-        .role-btns button { padding: 14px 8px; border: 2px solid #e2e8f0; background: #f9fafb; border-radius: 10px; font-size: 15px; font-weight: 700; cursor: pointer; }
-        .role-btns button.sel-jefe { border-color: #ff6b1a; background: #fff5ee; color: #e55a0a; }
-        .role-btns button.sel-socio { border-color: #3b82f6; background: #eff6ff; color: #1d4ed8; }
-        .login-container input { width: 100%; padding: 12px; margin-bottom: 15px; border: 2px solid #e2e8f0; border-radius: 8px; font-size: 16px; }
-        .login-container .enter { width: 100%; padding: 14px; background: #ff6b1a; color: white; border: none; border-radius: 8px; font-size: 16px; font-weight: 600; cursor: pointer; }
-        .login-hint { text-align: center; margin-top: 18px; color: #6b7a8f; font-size: 13px; }
-        .error-box { background: #fee2e2; border: 2px solid #ef4444; color: #991b1b; padding: 15px; border-radius: 8px; margin-bottom: 15px; font-size: 14px; display: none; }
-        .tabs { display: flex; gap: 10px; margin-bottom: 20px; flex-wrap: wrap; }
-        .tab { padding: 12px 24px; background: white; border: 2px solid #e2e8f0; border-radius: 8px; cursor: pointer; font-weight: 600; }
-        .tab.active { background: #ff6b1a; color: white; border-color: #ff6b1a; }
-        .pedido-card { background: white; border-radius: 12px; padding: 20px; margin-bottom: 15px; box-shadow: 0 4px 12px rgba(0,0,0,0.08); border-left: 4px solid #ff6b1a; }
-        .pedido-card.pendiente { border-left-color: #f59e0b; }
-        .pedido-card.aceptado { border-left-color: #3b82f6; }
-        .pedido-card.completado { border-left-color: #22c55e; }
-        .pedido-card.rechazado { border-left-color: #94a3b8; opacity: .75; }
-        .pedido-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; flex-wrap: wrap; gap: 8px; }
-        .pedido-header h3 { font-size: 18px; color: #1a2332; }
-        .pedido-status { padding: 6px 12px; border-radius: 50px; font-size: 12px; font-weight: 700; text-transform: uppercase; }
-        .pedido-status.pendiente { background: #fef3c7; color: #92400e; }
-        .pedido-status.aceptado { background: #dbeafe; color: #1e40af; }
-        .pedido-status.completado { background: #d1fae5; color: #065f46; }
-        .pedido-status.rechazado { background: #e2e8f0; color: #475569; }
-        .pedido-details { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-bottom: 15px; }
-        .pedido-detail label { display: block; font-size: 12px; color: #6b7a8f; font-weight: 600; margin-bottom: 4px; }
-        .pedido-detail span { font-size: 15px; font-weight: 600; color: #1a2332; }
-        .pedido-actions { display: flex; gap: 10px; flex-wrap: wrap; }
-        .pedido-actions button { padding: 10px 20px; border: none; border-radius: 8px; font-weight: 600; cursor: pointer; font-size: 14px; }
-        .btn-aceptar { background: #22c55e; color: white; }
-        .btn-rechazar { background: #ef4444; color: white; }
-        .btn-completar { background: #3b82f6; color: white; }
-        .btn-eliminar { background: #94a3b8; color: white; }
-        .form-pedido { background: white; border-radius: 12px; padding: 30px; margin-bottom: 30px; box-shadow: 0 4px 12px rgba(0,0,0,0.08); }
-        .form-pedido h2 { margin-bottom: 20px; color: #ff6b1a; }
-        .form-group { margin-bottom: 15px; }
-        .form-group label { display: block; margin-bottom: 6px; font-weight: 600; color: #1a2332; }
-        .form-group input, .form-group select, .form-group textarea { width: 100%; padding: 10px; border: 2px solid #e2e8f0; border-radius: 8px; font-size: 15px; font-family: inherit; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #f5f7fa; padding: 20px; }
+        .container { max-width: 600px; margin: 0 auto; background: white; border-radius: 16px; padding: 30px; box-shadow: 0 10px 40px rgba(0,0,0,0.1); }
+        .back { display: inline-block; margin-bottom: 15px; color: #6b7a8f; text-decoration: none; font-size: 14px; font-weight: 600; }
+        .back:hover { color: #ff6b1a; }
+        h1 { color: #ff6b1a; margin-bottom: 10px; font-size: 28px; }
+        .subtitle { color: #6b7a8f; margin-bottom: 30px; }
+        .form-group { margin-bottom: 20px; }
+        .form-group label { display: block; margin-bottom: 8px; font-weight: 600; color: #1a2332; font-size: 15px; }
+        .form-group input, .form-group select, .form-group textarea {
+            width: 100%; padding: 12px; border: 2px solid #e2e8f0; border-radius: 8px; font-size: 15px; font-family: inherit;
+            transition: border-color 0.2s;
+        }
+        .form-group input:focus, .form-group select:focus, .form-group textarea:focus { outline: none; border-color: #ff6b1a; }
         .form-group textarea { resize: vertical; min-height: 80px; }
         .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
-        .form-pedido button { padding: 14px 30px; background: #ff6b1a; color: white; border: none; border-radius: 8px; font-size: 16px; font-weight: 600; cursor: pointer; }
-        .empty-state { text-align: center; padding: 60px 20px; color: #6b7a8f; }
-        @media (max-width: 768px) {
+        .upload-btns { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+        .up-btn { padding: 16px 10px; border: 3px dashed #e2e8f0; border-radius: 12px; background: #f9fafb; cursor: pointer; font-size: 14px; font-weight: 700; color: #1a2332; font-family: inherit; transition: all .2s; }
+        .up-btn:hover { border-color: #ff6b1a; background: #fff5ee; }
+        .up-btn.cam { border-color: #ff6b1a; background: #fff5ee; color: #e55a0a; }
+        .up-btn .big { display: block; font-size: 26px; margin-bottom: 4px; }
+        .preview-container { margin-top: 15px; display: grid; grid-template-columns: repeat(auto-fill, minmax(90px, 1fr)); gap: 10px; }
+        .preview-item { position: relative; border-radius: 8px; overflow: hidden; aspect-ratio: 1; }
+        .preview-item img { width: 100%; height: 100%; object-fit: cover; }
+        .preview-item .remove { position: absolute; top: 5px; right: 5px; background: #ef4444; color: white; border: none; width: 24px; height: 24px; border-radius: 50%; cursor: pointer; font-size: 16px; line-height: 1; }
+        .btn-submit { width: 100%; padding: 16px; background: #ff6b1a; color: white; border: none; border-radius: 8px; font-size: 17px; font-weight: 700; cursor: pointer; transition: background 0.2s; }
+        .btn-submit:hover { background: #e55a0a; }
+        .btn-submit:disabled { background: #cbd5e1; cursor: not-allowed; }
+        .rgpd { margin-top: 14px; font-size: 12px; color: #6b7a8f; text-align: center; line-height: 1.5; }
+        .rgpd a { color: #ff6b1a; }
+        .success-message { background: #d1fae5; border: 2px solid #22c55e; border-radius: 12px; padding: 20px; text-align: center; margin-top: 20px; }
+        .success-message h3 { color: #065f46; margin-bottom: 10px; }
+        .success-message p { color: #047857; }
+        .loading { display: none; text-align: center; padding: 20px; }
+        .loading.active { display: block; }
+        .spinner { width: 40px; height: 40px; border: 4px solid #e2e8f0; border-top-color: #ff6b1a; border-radius: 50%; animation: spin 1s linear infinite; margin: 0 auto 10px; }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        @media (max-width: 600px) {
             .form-grid { grid-template-columns: 1fr; }
-            .pedido-details { grid-template-columns: 1fr; }
-            .header { flex-direction: column; text-align: center; }
+            .container { padding: 20px; }
         }
     </style>
 </head>
 <body>
+    <div class="container">
+        <a href="index.html" class="back">← Volver a UrgePack Madrid</a>
+        <h1>📦 Pedir Presupuesto</h1>
+        <p class="subtitle">Sube una foto y te damos precio cerrado lo antes posible</p>
 
-    <!-- LOGIN -->
-    <div id="login-screen" class="login-container">
-        <h2>🚐 Panel Flota UrgePack</h2>
-        <div id="error-box" class="error-box"></div>
-        <div class="role-btns">
-            <button id="btn-jefe" onclick="setModo('jefe')">👑 Soy JEFE</button>
-            <button id="btn-socio" onclick="setModo('socio')">👷 Soy SOCIO</button>
+        <form id="form-presupuesto">
+            <!-- FOTOS: CÁMARA O GALERÍA -->
+            <div class="form-group">
+                <label>📸 Fotos del mueble o paquete (máximo 5)</label>
+                <div class="upload-btns">
+                    <button type="button" class="up-btn cam" onclick="document.getElementById('file-camera').click()">
+                        <span class="big">📷</span>Hacer foto ahora
+                    </button>
+                    <button type="button" class="up-btn" onclick="document.getElementById('file-gallery').click()">
+                        <span class="big">🖼️</span>Elegir de galería
+                    </button>
+                </div>
+                <input type="file" id="file-camera" accept="image/*" capture="environment" style="display:none;">
+                <input type="file" id="file-gallery" accept="image/*" multiple style="display:none;">
+                <div class="preview-container" id="preview-container"></div>
+            </div>
+
+            <!-- DATOS DEL CLIENTE -->
+            <div class="form-grid">
+                <div class="form-group">
+                    <label>👤 Nombre *</label>
+                    <input type="text" id="nombre" required placeholder="Tu nombre">
+                </div>
+                <div class="form-group">
+                    <label>📞 Teléfono *</label>
+                    <input type="tel" id="telefono" required placeholder="612 345 678">
+                </div>
+            </div>
+
+            <!-- ORIGEN Y DESTINO -->
+            <div class="form-grid">
+                <div class="form-group">
+                    <label>📍 Origen *</label>
+                    <input type="text" id="origen" required placeholder="Calle, número, ciudad">
+                </div>
+                <div class="form-group">
+                    <label>🎯 Destino *</label>
+                    <input type="text" id="destino" required placeholder="Calle, número, ciudad">
+                </div>
+            </div>
+
+            <!-- TIPO DE SERVICIO -->
+            <div class="form-group">
+                <label>🚚 Tipo de servicio *</label>
+                <select id="tipo" required>
+                    <option value="">— Selecciona —</option>
+                    <option value="mueble">Transporte de mueble suelto</option>
+                    <option value="mudanza-estudio">Mudanza estudio / 1 habitación</option>
+                    <option value="mudanza-2hab">Mudanza piso 2 dormitorios</option>
+                    <option value="mudanza-grande">Mudanza grande (3+ habitaciones)</option>
+                    <option value="envio">Envío urgente (paquete)</option>
+                    <option value="otro">Otro (especificar en notas)</option>
+                </select>
+            </div>
+
+            <!-- DETALLES -->
+            <div class="form-grid">
+                <div class="form-group">
+                    <label>🏢 ¿Hay ascensor?</label>
+                    <select id="ascensor">
+                        <option value="si">Sí, hay ascensor</option>
+                        <option value="no">No, son escaleras</option>
+                        <option value="no-se">No lo sé</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>📅 ¿Para cuándo?</label>
+                    <select id="urgencia">
+                        <option value="hoy">Hoy mismo</option>
+                        <option value="manana">Mañana</option>
+                        <option value="semana">Esta semana</option>
+                        <option value="flexible">Soy flexible</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label>📝 Notas adicionales</label>
+                <textarea id="notas" placeholder="Ej: 4º piso sin ascensor, el sofá no cabe por la escalera, necesito ayuda para desmontar..."></textarea>
+            </div>
+
+            <button type="submit" class="btn-submit" id="btn-submit">
+                🚀 Enviar Solicitud de Presupuesto
+            </button>
+            <p class="rgpd">Al enviar aceptas nuestra <a href="privacidad.html" target="_blank">Política de Privacidad</a>.<br>Tus datos y fotos se usan únicamente para prepararte tu presupuesto.</p>
+        </form>
+
+        <div class="loading" id="loading">
+            <div class="spinner"></div>
+            <p>Enviando tu solicitud...</p>
         </div>
-        <input type="password" id="password" placeholder="Contraseña del equipo" onkeypress="if(event.key==='Enter') login()">
-        <button class="enter" onclick="login()">Entrar</button>
-        <p class="login-hint">Contraseña del equipo: <strong>urgepack2026</strong></p>
-        <p class="login-hint" id="status-firebase">⏳ Cargando Firebase...</p>
-    </div>
 
-    <!-- PANEL -->
-    <div id="panel-screen" style="display:none;">
-        <div class="container">
-            <div class="header">
-                <h1>🚐 Panel Flota <span class="live-dot"></span><small>EN VIVO</small> <span id="rol-badge" class="rol-badge"></span></h1>
-                <div>
-                    <button onclick="logout()">Salir</button>
-                </div>
-            </div>
-
-            <div class="tabs">
-                <div class="tab active" id="tab-btn-crear" onclick="showTab('crear')">➕ Crear Pedido</div>
-                <div class="tab" id="tab-btn-pedidos" onclick="showTab('pedidos')">📋 Pedidos</div>
-            </div>
-
-            <div id="tab-crear" class="form-pedido">
-                <h2>➕ Crear Nuevo Pedido</h2>
-                <div class="form-grid">
-                    <div class="form-group"><label>Cliente *</label><input type="text" id="cliente" placeholder="Nombre del cliente"></div>
-                    <div class="form-group"><label>Teléfono</label><input type="tel" id="telefono" placeholder="612 345 678"></div>
-                </div>
-                <div class="form-grid">
-                    <div class="form-group"><label>Origen *</label><input type="text" id="origen" placeholder="Calle, número, ciudad"></div>
-                    <div class="form-group"><label>Destino *</label><input type="text" id="destino" placeholder="Calle, número, ciudad"></div>
-                </div>
-                <div class="form-grid">
-                    <div class="form-group">
-                        <label>Tipo de Servicio</label>
-                        <select id="tipo">
-                            <option value="envio">Envío urgente</option>
-                            <option value="mueble">Transporte de mueble</option>
-                            <option value="mudanza">Mudanza</option>
-                        </select>
-                    </div>
-                    <div class="form-group"><label>Precio (€) *</label><input type="number" id="precio" placeholder="120" step="0.01"></div>
-                </div>
-                <div class="form-grid">
-                    <div class="form-group"><label>Fecha</label><input type="date" id="fecha"></div>
-                    <div class="form-group"><label>Hora</label><input type="time" id="hora"></div>
-                </div>
-                <div class="form-group"><label>Notas</label><textarea id="notas" placeholder="4º sin ascensor, necesita ayuda, etc."></textarea></div>
-                <button onclick="crearPedido()">Crear Pedido</button>
-            </div>
-
-            <div id="tab-pedidos" style="display:none;">
-                <div id="lista-pedidos"></div>
-            </div>
+        <div class="success-message" id="success-message" style="display: none;">
+            <h3>✅ ¡Solicitud enviada!</h3>
+            <p>Hemos recibido tu solicitud con tus fotos. Te contactaremos lo antes posible con tu precio cerrado.</p>
+            <p style="margin-top: 10px;"><strong>📞 ¿Urgente?</strong> Llámanos al <a href="tel:+34744254750" style="color: #ff6b1a;">744 254 750</a> o escríbenos por <a href="https://wa.me/34744254750" style="color: #ff6b1a;">WhatsApp</a></p>
         </div>
     </div>
 
     <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-database-compat.js"></script>
 
     <script>
         // =====================================================
-        // 🔥 IMPORTANTE: PEGA AQUÍ TU firebaseConfig COMPLETO
-        // Copia TODO el bloque desde Firebase Console y pégalo aquí
-        // Asegúrate de incluir la línea databaseURL
+        // 🔥 PEGA AQUÍ TU firebaseConfig (el mismo del panel de flota)
         // =====================================================
-        
         const firebaseConfig = {
          apiKey: "AIzaSyCWTIIrqjKniH_uEGiy2alCE4xlVSNxNRY",
          authDomain: "urgepack-flota.firebaseapp.com",
@@ -152,205 +169,118 @@
          messagingSenderId: "594407555675",
          appId: "1:594407555675:web:5799154aa155f7de8f757e"
         };
-        
         // =====================================================
 
-        let modoLogin = null;
-        let modoActual = null;
-        let auth, db;
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.database();
 
-        try {
-            firebase.initializeApp(firebaseConfig);
-            auth = firebase.auth();
-            db = firebase.database();
-            document.getElementById('status-firebase').textContent = '✅ Firebase cargado. Elige tu rol y entra.';
-            console.log('✅ Firebase inicializado correctamente');
-        } catch (error) {
-            mostrarError('Error inicializando Firebase: ' + error.message + '. Revisa que hayas pegado tu firebaseConfig completo (con databaseURL).');
-            console.error('❌ Error Firebase:', error);
-        }
+        const CLOUDINARY_CLOUD_NAME = 'dzccu2xy';
+        const CLOUDINARY_UPLOAD_PRESET = 'ml_default';
+        const EMAIL_AVISO = 'urgepack1@gmail.com';
 
-        function mostrarError(msg) {
-            const box = document.getElementById('error-box');
-            box.textContent = '❌ ' + msg;
-            box.style.display = 'block';
-        }
+        let uploadedImages = [];
 
-        function setModo(m) {
-            modoLogin = m;
-            document.getElementById('btn-jefe').className = (m === 'jefe') ? 'sel-jefe' : '';
-            document.getElementById('btn-socio').className = (m === 'socio') ? 'sel-socio' : '';
-        }
+        // ===== SUBIDA DE FOTOS (cámara o galería) =====
+        document.getElementById('file-camera').addEventListener('change', e => handleFiles(e.target.files));
+        document.getElementById('file-gallery').addEventListener('change', e => handleFiles(e.target.files));
 
-        function login() {
-            if (!auth) { mostrarError('Firebase no está cargado. Revisa la consola (F12).'); return; }
-            if (!modoLogin) { alert('Pulsa primero si eres JEFE o SOCIO'); return; }
-            const pass = document.getElementById('password').value;
-            const email = (modoLogin === 'jefe') ? 'jefe@urgepack.es' : 'socio@urgepack.es';
-            auth.signInWithEmailAndPassword(email, pass)
-                .catch(err => {
-                    let msg = 'Error al entrar';
-                    if (err.code === 'auth/user-not-found' || err.code === 'auth/invalid-email') {
-                        msg = 'El usuario no existe. Revisa que hayas creado ' + email + ' en Firebase Authentication.';
-                    } else if (err.code === 'auth/wrong-password') {
-                        msg = 'Contraseña incorrecta. Usa: urgepack2026';
-                    } else if (err.code === 'auth/invalid-credential') {
-                        msg = 'Credenciales incorrectas. Revisa email y contraseña.';
-                    }
-                    mostrarError(msg);
-                });
-        }
-
-        function logout() { auth.signOut(); }
-
-        if (auth) {
-            auth.onAuthStateChanged(user => {
-                if (user) {
-                    modoActual = (user.email === 'jefe@urgepack.es') ? 'jefe' : 'socio';
-                    document.getElementById('login-screen').style.display = 'none';
-                    document.getElementById('panel-screen').style.display = 'block';
-                    configurarInterfaz();
-                    escucharPedidos();
+        function handleFiles(files) {
+            const remaining = 5 - uploadedImages.length;
+            Array.from(files).slice(0, remaining).forEach(file => {
+                if (file.type.startsWith('image/') && file.size <= 10 * 1024 * 1024) {
+                    uploadToCloudinary(file);
                 } else {
-                    modoActual = null;
-                    document.getElementById('login-screen').style.display = 'block';
-                    document.getElementById('panel-screen').style.display = 'none';
+                    alert(`El archivo ${file.name} no es válido o supera 10MB`);
                 }
             });
         }
 
-        function configurarInterfaz() {
-            const badge = document.getElementById('rol-badge');
-            const tabCrear = document.getElementById('tab-btn-crear');
-            if (modoActual === 'jefe') {
-                badge.textContent = '👑 JEFE';
-                badge.className = 'rol-badge rol-jefe';
-                tabCrear.style.display = 'block';
-            } else {
-                badge.textContent = '👷 SOCIO';
-                badge.className = 'rol-badge rol-socio';
-                tabCrear.style.display = 'none';
-                showTab('pedidos');
+        async function uploadToCloudinary(file) {
+            const formData = new FormData();
+            formData.append('file', file);
+            formData.append('upload_preset', CLOUDINARY_UPLOAD_PRESET);
+            try {
+                const response = await fetch(`https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUD_NAME}/image/upload`, {
+                    method: 'POST',
+                    body: formData
+                });
+                const data = await response.json();
+                uploadedImages.push({ url: data.secure_url });
+                renderPreviews();
+            } catch (error) {
+                console.error('Error subiendo imagen:', error);
+                alert('Error al subir la imagen. Inténtalo de nuevo.');
             }
         }
 
-        function showTab(tab) {
-            if (modoActual === 'socio') tab = 'pedidos';
-            document.getElementById('tab-crear').style.display = tab === 'crear' ? 'block' : 'none';
-            document.getElementById('tab-pedidos').style.display = tab === 'pedidos' ? 'block' : 'none';
-            document.getElementById('tab-btn-crear').classList.toggle('active', tab === 'crear');
-            document.getElementById('tab-btn-pedidos').classList.toggle('active', tab === 'pedidos');
-        }
-
-        function crearPedido() {
-            const cliente = document.getElementById('cliente').value.trim();
-            const origen = document.getElementById('origen').value.trim();
-            const destino = document.getElementById('destino').value.trim();
-            const precio = document.getElementById('precio').value;
-            if (!cliente || !origen || !destino || !precio) {
-                alert('Completa: Cliente, Origen, Destino y Precio');
-                return;
-            }
-            const pedido = {
-                cliente, telefono: document.getElementById('telefono').value.trim(),
-                origen, destino,
-                tipo: document.getElementById('tipo').value,
-                precio: parseFloat(precio),
-                fecha: document.getElementById('fecha').value,
-                hora: document.getElementById('hora').value,
-                notas: document.getElementById('notas').value.trim(),
-                estado: 'pendiente', socioAsignado: null,
-                fechaCreacion: new Date().toISOString()
-            };
-            db.ref('pedidos').push(pedido).then(() => {
-                alert('✅ Pedido publicado.');
-                ['cliente','telefono','origen','destino','precio','notas'].forEach(id => document.getElementById(id).value = '');
-                showTab('pedidos');
-            }).catch(err => mostrarError('Error al crear: ' + err.message));
-        }
-
-        function escucharPedidos() {
-            db.ref('pedidos').on('value', snap => {
-                const pedidos = [];
-                snap.forEach(child => pedidos.push(Object.assign({ id: child.key }, child.val())));
-                pedidos.sort((a, b) => (b.fechaCreacion || '').localeCompare(a.fechaCreacion || ''));
-                renderPedidos(pedidos);
-            }, err => mostrarError('Error al escuchar pedidos: ' + err.message));
-        }
-
-        function renderPedidos(pedidos) {
-            let lista = pedidos;
-            if (modoActual === 'socio') {
-                lista = pedidos.filter(p => p.estado === 'pendiente');
-            }
-
-            const container = document.getElementById('lista-pedidos');
-            const titulo = (modoActual === 'socio')
-                ? '<h2 style="margin-bottom:15px;">📥 Trabajos disponibles para ti</h2>'
-                : '';
-
-            if (!lista.length) {
-                container.innerHTML = titulo + '<div class="empty-state"><h3>📭 Nada por aquí</h3><p>' +
-                    (modoActual === 'socio' ? 'No hay trabajos disponibles ahora mismo.' : 'Crea el primero en "Crear Pedido"') +
-                    '</p></div>';
-                return;
-            }
-
-            container.innerHTML = titulo + lista.map(p => `
-                <div class="pedido-card ${p.estado}">
-                    <div class="pedido-header">
-                        <h3>${p.cliente}</h3>
-                        <span class="pedido-status ${p.estado}">${p.estado}</span>
-                    </div>
-                    <div class="pedido-details">
-                        <div class="pedido-detail"><label>📞 Teléfono</label><span>${p.telefono || '-'}</span></div>
-                        <div class="pedido-detail"><label>📍 Origen</label><span>${p.origen}</span></div>
-                        <div class="pedido-detail"><label>🎯 Destino</label><span>${p.destino}</span></div>
-                        <div class="pedido-detail"><label>📦 Tipo</label><span>${p.tipo === 'envio' ? 'Envío' : p.tipo === 'mueble' ? 'Mueble' : 'Mudanza'}</span></div>
-                        <div class="pedido-detail"><label>💰 Precio</label><span>${Number(p.precio).toFixed(2)}€</span></div>
-                        <div class="pedido-detail"><label>📅 Fecha/Hora</label><span>${p.fecha || '-'} ${p.hora || ''}</span></div>
-                        ${p.socioAsignado ? `<div class="pedido-detail"><label>👤 Socio</label><span>${p.socioAsignado}</span></div>` : ''}
-                        ${p.notas ? `<div class="pedido-detail"><label>📝 Notas</label><span>${p.notas}</span></div>` : ''}
-                    </div>
-                    <div class="pedido-actions">
-                        ${p.estado === 'pendiente' ? `
-                            <button class="btn-aceptar" onclick="aceptarPedido('${p.id}')">✅ Aceptar</button>
-                            <button class="btn-rechazar" onclick="rechazarPedido('${p.id}')">❌ Rechazar</button>
-                        ` : ''}
-                        ${p.estado === 'aceptado' && modoActual === 'jefe' ? `
-                            <button class="btn-completar" onclick="completarPedido('${p.id}')">✓ Completar</button>
-                        ` : ''}
-                        ${modoActual === 'jefe' ? `
-                            <button class="btn-eliminar" onclick="eliminarPedido('${p.id}')">🗑️</button>
-                        ` : ''}
-                    </div>
+        function renderPreviews() {
+            document.getElementById('preview-container').innerHTML = uploadedImages.map((img, i) => `
+                <div class="preview-item">
+                    <img src="${img.url}" alt="Foto ${i + 1}">
+                    <button type="button" class="remove" onclick="removeImage(${i})">×</button>
                 </div>
             `).join('');
         }
 
-        function aceptarPedido(id) {
-            const socio = prompt('Escribe tu nombre:');
-            if (!socio) return;
-            db.ref('pedidos/' + id).update({ estado: 'aceptado', socioAsignado: socio });
+        function removeImage(index) {
+            uploadedImages.splice(index, 1);
+            renderPreviews();
         }
 
-        function rechazarPedido(id) {
-            const motivo = prompt('¿Por qué lo rechazas? (opcional)');
-            db.ref('pedidos/' + id).update({ estado: 'rechazado', motivoRechazo: motivo || 'Sin motivo' });
-        }
+        // ===== ENVÍO DEL FORMULARIO =====
+        document.getElementById('form-presupuesto').addEventListener('submit', async (e) => {
+            e.preventDefault();
 
-        function completarPedido(id) {
-            if (!confirm('¿Marcar como completado?')) return;
-            db.ref('pedidos/' + id).update({ estado: 'completado', fechaCompletado: new Date().toISOString() });
-        }
+            const btnSubmit = document.getElementById('btn-submit');
+            const loading = document.getElementById('loading');
 
-        function eliminarPedido(id) {
-            if (!confirm('¿Eliminar este pedido?')) return;
-            db.ref('pedidos/' + id).remove();
-        }
+            btnSubmit.disabled = true;
+            loading.classList.add('active');
 
-        document.getElementById('fecha').valueAsDate = new Date();
-        document.getElementById('hora').value = new Date().toTimeString().slice(0, 5);
+            const datos = {
+                nombre: document.getElementById('nombre').value.trim(),
+                telefono: document.getElementById('telefono').value.trim(),
+                origen: document.getElementById('origen').value.trim(),
+                destino: document.getElementById('destino').value.trim(),
+                tipo: document.getElementById('tipo').value,
+                ascensor: document.getElementById('ascensor').value,
+                urgencia: document.getElementById('urgencia').value,
+                notas: document.getElementById('notas').value.trim(),
+                fotos: uploadedImages.map(img => img.url),
+                fecha: new Date().toISOString(),
+                estado: 'nueva'
+            };
+
+            try {
+                // CANAL 1: guardar en Firebase (nodo solicitudes)
+                await db.ref('solicitudes').push(datos);
+
+                // CANAL 2: aviso por email (FormSubmit)
+                try {
+                    const datosEmail = Object.assign({}, datos);
+                    datosEmail.fotos = undefined;
+                    datos.fotos.forEach((url, i) => { datosEmail['Foto ' + (i + 1)] = url; });
+                    datosEmail._subject = '📸 NUEVA solicitud de presupuesto - UrgePack';
+                    await fetch('https://formsubmit.co/ajax/' + EMAIL_AVISO, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+                        body: JSON.stringify(datosEmail)
+                    });
+                } catch (emailErr) {
+                    console.warn('El email no se pudo enviar (quizá falta activar FormSubmit):', emailErr);
+                }
+
+                document.getElementById('form-presupuesto').style.display = 'none';
+                loading.classList.remove('active');
+                document.getElementById('success-message').style.display = 'block';
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            } catch (error) {
+                console.error(error);
+                alert('Error al enviar. Por favor, llámanos al 744 254 750');
+                btnSubmit.disabled = false;
+                loading.classList.remove('active');
+            }
+        });
     </script>
 </body>
 </html>
